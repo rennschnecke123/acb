@@ -1,0 +1,22 @@
+
+# Example 1
+# sftp server for demo
+sftpHOST=duplicity.duckdns.org
+sftpUSER=duplicity
+sftpPASSWORD=duplicity
+useTOR=0
+
+# Example 2
+# same as #1 but via tor
+sftpHOST=3krgemfif7cp536w.onion
+sftpUSER=duplicity
+sftpPASSWORD=duplicity
+useTOR=1
+
+# Example 3
+# get https://keybase.io and become a member of "acbackup" group!
+# you will get 250GB space for free!
+sftpHOST=localhost
+sftpPATH=//keybase/team/acbackup/data
+useTOR=0
+
