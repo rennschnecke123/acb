@@ -1,0 +1,11 @@
+Try to restore following backup:
+
+via duplicity:
+duplicity restore --ssh-options="-oStrictHostKeyChecking=no" -v4 sftp://duplicity:duplicity@duplicity.duckdns.org:22//upload/demo/ acb_tmp/
+
+same via acb:
+acb -i "/upload/demo"
+
+
+
+The pw is... "demo"! ;-) 
