@@ -348,7 +348,14 @@ case "$1" in
     $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/acBackup/**" --exclude "**/.cache/**" -v4 $(echo $encrypt) --full-if-older-than $fullBackupAfter "$path" $connectString/$path/acBackup/"$md5all"/ 2>>$logfile  && $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity cleanup $strictHostkeyChecking -v4 $(echo $encrypt) --force $connectString/$path/acBackup/"$md5all"/ 2>>$logfile
   fi
    echo "----------------------------------"
+
+
    backup2ipfs copy
+   echo "###############################" >> ipfs-urls.txt 2>/dev/null
+   echo "# created with acb - https://github.com/rennschnecke123/acb" >> ipfs-urls.txt 2>/dev/null
+   echo "# be sure you have the valid acb.ini file!!!" >> ipfs-urls.txt 2>/dev/null
+   echo "###############################" >> ipfs-urls.txt 2>/dev/null
+
 ;;
 
 -bLocal)
