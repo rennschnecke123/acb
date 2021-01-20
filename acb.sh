@@ -306,6 +306,95 @@ case "$1" in
    echo "----------------------------------"
 ;;
 
+-toIPFS)
+  printconfig
+  echo "BACKUP from $path/:"
+  #duplicity_status
+  # set vars
+  connectString="file:///"
+  torsocks=""
+  useTOR=0
+  enrypt=''
+  usePASSPHRASE="$env PASSPHRASE=$passphrase"
+  sftpPATH="acBackup"
+  
+  FREE=$(df . | tail -1 | awk '{print $4}')
+  NEEDED=$(du . | tail -1 | awk '{print $1}')
+  if [ "$FREE" -lt "$NEEDED" ];
+  then
+	echo "not enough space on disk!"
+	exit 0
+  fi
+
+
+  which=$(which backup2ipfs)
+  if [ "$which" == "" ];
+  then
+              echo "backup2ipfs not found!"
+              exit 0
+  fi
+
+  rm -rf "$path"/acb_tmp/ 2>>$logfile
+  mkdir -p "$path"/acBackup/ 2>>$logfile
+   echo "----------------------------------"
+  if [ $fullBackups -gt 0 ]
+  then
+    $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity remove-all-but-n-full $fullBackups $strictHostkeyChecking -v4 --force $connectString/$path/acBackup/"$md5all"/ 2>>$logfile
+  fi
+  if [ "$path" = "/" ]
+  then
+    $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/acBackup/**" --exclude "**/.cache/**" --exclude "/proc/**" --exclude "/sys/**" --exclude "/dev/**" --exclude "/run/**" -v4 $(echo $encrypt) --full-if-older-than $fullBackupAfter "$path" $connectString/$path/acBackup/"$md5all"/ 2>>$logfile  && $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity cleanup $strictHostkeyChecking -v4 $(echo $encrypt) --force $connectString/$path/acBackup/"$md5all"/  2>>$logfile
+  else
+    $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/acBackup/**" --exclude "**/.cache/**" -v4 $(echo $encrypt) --full-if-older-than $fullBackupAfter "$path" $connectString/$path/acBackup/"$md5all"/ 2>>$logfile  && $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity cleanup $strictHostkeyChecking -v4 $(echo $encrypt) --force $connectString/$path/acBackup/"$md5all"/ 2>>$logfile
+  fi
+   echo "----------------------------------"
+   backup2ipfs copy
+;;
+
+-bLocal)
+  printconfig
+  echo "BACKUP from $path/:"
+  #duplicity_status
+  # set vars
+  connectString="file:///"
+  torsocks=""
+  useTOR=0
+  enrypt=''
+  usePASSPHRASE="$env PASSPHRASE=$passphrase"
+  sftpPATH="acBackup"
+
+  FREE=$(df . | tail -1 | awk '{print $4}')
+  NEEDED=$(du . | tail -1 | awk '{print $1}')
+  if [ "$FREE" -lt "$NEEDED" ];
+  then
+        echo "not enough space on disk!"
+        exit 0
+  fi
+
+
+  which=$(which backup2ipfs)
+  if [ "$which" == "" ];
+  then
+              echo "backup2ipfs not found!"
+              exit 0
+  fi
+
+  rm -rf "$path"/acb_tmp/ 2>>$logfile
+  mkdir -p "$path"/acBackup/ 2>>$logfile
+   echo "----------------------------------"
+  if [ $fullBackups -gt 0 ]
+  then
+    $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity remove-all-but-n-full $fullBackups $strictHostkeyChecking -v4 --force $connectString/$path/acBackup/"$md5all"/ 2>>$logfile
+  fi
+  if [ "$path" = "/" ]
+  then
+    $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/acBackup/**" --exclude "**/.cache/**" --exclude "/proc/**" --exclude "/sys/**" --exclude "/dev/**" --exclude "/run/**" -v4 $(echo $encrypt) --full-if-older-than $fullBackupAfter "$path" $connectString/$path/acBackup/"$md5all"/ 2>>$logfile  && $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity cleanup $strictHostkeyChecking -v4 $(echo $encrypt) --force $connectString/$path/acBackup/"$md5all"/  2>>$logfile
+  else
+    $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/acBackup/**" --exclude "**/.cache/**" -v4 $(echo $encrypt) --full-if-older-than $fullBackupAfter "$path" $connectString/$path/acBackup/"$md5all"/ 2>>$logfile  && $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity cleanup $strictHostkeyChecking -v4 $(echo $encrypt) --force $connectString/$path/acBackup/"$md5all"/ 2>>$logfile
+  fi
+   echo "----------------------------------"
+;;
+
 -bb)
   printconfig
   echo "BACKUP from $path/ without partition limit:"
@@ -365,6 +454,85 @@ case "$1" in
       mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
       $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$sftpPATH/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile 
     fi    
+;;
+
+-fromIPFS)
+    printconfig
+    echo "ID: $md5all"
+    pattern="$2"
+    echo "RESTORE to $path/acb_tmp:"
+    #duplicity_status
+    # set vars
+    connectString="file:///"
+    torsocks=""
+    useTOR=0
+    enrypt=''
+    usePASSPHRASE="$env PASSPHRASE=$passphrase"
+    sftpPATH="acBackup"
+
+    which=$(which backup2ipfs)
+    if [ "$which" == "" ];
+    then
+		echo "backup2ipfs not found!"
+		exit 0
+    fi
+    backup2ipfs rebuild
+
+    FREE=$(df . | tail -1 | awk '{print $4}')
+    NEEDED=$(du . | tail -1 | awk '{print $1}')
+    if [ "$FREE" -lt "$NEEDED" ];
+    then
+          echo "not enough space on disk!"
+          exit 0
+    fi
+
+    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    if [ "$pattern" = "" ]
+    then
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile
+    else
+      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+    fi
+;;
+
+-rLocal)
+    printconfig
+    echo "ID: $md5all"
+    pattern="$2"
+    echo "RESTORE to $path/acb_tmp:"
+    #duplicity_status
+    # set vars
+    connectString="file:///"
+    torsocks=""
+    useTOR=0
+    enrypt=''
+    usePASSPHRASE="$env PASSPHRASE=$passphrase"
+    sftpPATH="acBackup"
+
+    which=$(which backup2ipfs)
+    if [ "$which" == "" ];
+    then
+                echo "backup2ipfs not found!"
+                exit 0
+    fi
+
+    FREE=$(df . | tail -1 | awk '{print $4}')
+    NEEDED=$(du . | tail -1 | awk '{print $1}')
+    if [ "$FREE" -lt "$NEEDED" ];
+    then
+          echo "not enough space on disk!"
+          exit 0
+    fi
+
+    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    if [ "$pattern" = "" ]
+    then
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile
+    else
+      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+    fi
 ;;
 
 -t)
@@ -618,11 +786,13 @@ case "$1" in
 cat << otherEOF
     syntax:
 
-    acb [-r] [-b] [-bb] [-lb] [-lf] [-s] [-t] [-i] [-v] [-x] [-xx] [-y] [-yy] [-c] [-u]
+    acb [-r] [-rLocal] [-b] [-blocal] [-bb] [-lb] [-lf] [-s] [-t] [-i] [-v] [-x] [-xx] [-y] [-yy] [-c] [-u] [-toIPFS] [-fromIPFS]
     (only one param at a time!)
 
     -r: restore (<path>)
+    -rLocal: like -r on subfolder "acBackup"
     -b: backup
+    -bLocal: like -b on subfolder "acBackup"
     -bb: backup without partition limit
     -lb: list backups
     -lf: list files
@@ -636,10 +806,13 @@ cat << otherEOF
     -yy: unencrypted temp backup without partition limit
     -c: cleanup backup
     -u: delete local locks
+    -toIPFS: store (encrypted!) backup in ipfs *)
+    -fromIPFS: get data from ipfs *)
 
     configuration file: ~/.acb/acb.ini
 
-
+    *) backup2ipfs needs to be installed:
+       https://github.com/rennschnecke123/backup2ipfs
 
 otherEOF
     exit
