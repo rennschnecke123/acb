@@ -9,7 +9,7 @@
 # Usage:
 # acb -b -> make backup from actual path
 # acb -r -> make restore from actual path to
-#            subfolder acb_tmp/
+#            subfolder acRestore/
 ################################################
 #
 # This will store your crypted backups on a
@@ -291,7 +291,7 @@ case "$1" in
   printconfig
   echo "BACKUP from $path/:"
   #duplicity_status
-  rm -rf "$path"/acb_tmp/ 2>>$logfile
+  rm -rf "$path"/acRestore/ 2>>$logfile
    echo "----------------------------------"
   if [ $fullBackups -gt 0 ]
   then
@@ -334,7 +334,7 @@ case "$1" in
               exit 0
   fi
 
-  rm -rf "$path"/acb_tmp/ 2>>$logfile
+  rm -rf "$path"/acRestore/ 2>>$logfile
   mkdir -p "$path"/acBackup/ 2>>$logfile
    echo "----------------------------------"
   if [ $fullBackups -gt 0 ]
@@ -386,7 +386,7 @@ case "$1" in
               exit 0
   fi
 
-  rm -rf "$path"/acb_tmp/ 2>>$logfile
+  rm -rf "$path"/acRestore/ 2>>$logfile
   mkdir -p "$path"/acBackup/ 2>>$logfile
    echo "----------------------------------"
   if [ $fullBackups -gt 0 ]
@@ -406,7 +406,7 @@ case "$1" in
   printconfig
   echo "BACKUP from $path/ without partition limit:"
   #duplicity_status
-  rm -rf "$path"/acb_tmp/ 2>>$logfile
+  rm -rf "$path"/acRestore/ 2>>$logfile
    echo "----------------------------------"
   if [ $fullBackups -gt 0 ]
   then
@@ -433,15 +433,15 @@ case "$1" in
 	    exit
     fi
 
-    echo "RESTORE from $ipfsurl to $path/acb_tmp:"
+    echo "RESTORE from $ipfsurl to $path/acRestore:"
     #duplicity_status
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
     if [ "$pattern" = "" ]
     then
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) "$ipfsurl" "$path"/acb_tmp/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) "$ipfsurl" "$path"/acRestore/ 2>>$logfile
     else
-      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" "$ipfsurl" "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+      mkdir -p "$path"/acRestore/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" "$ipfsurl" "$path"/acRestore/"$pattern"/ 2>>$logfile
     fi
 ;;
 
@@ -451,15 +451,15 @@ case "$1" in
     printconfig
     echo "ID: $md5all"
     pattern="$2"
-    echo "RESTORE to $path/acb_tmp:"
+    echo "RESTORE to $path/acRestore:"
     #duplicity_status
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
     if [ "$pattern" = "" ]
     then
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$sftpPATH/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile 
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$sftpPATH/"$md5all"/ "$path"/acRestore/ 2>>$logfile 
     else
-      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$sftpPATH/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile 
+      mkdir -p "$path"/acRestore/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$sftpPATH/"$md5all"/ "$path"/acRestore/"$pattern"/ 2>>$logfile 
     fi    
 ;;
 
@@ -467,7 +467,7 @@ case "$1" in
     printconfig
     echo "ID: $md5all"
     pattern="$2"
-    echo "RESTORE to $path/acb_tmp:"
+    echo "RESTORE to $path/acRestore:"
     #duplicity_status
     # set vars
     connectString="file:///"
@@ -493,13 +493,13 @@ case "$1" in
           exit 0
     fi
 
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
     if [ "$pattern" = "" ]
     then
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acRestore/ 2>>$logfile
     else
-      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+      mkdir -p "$path"/acRestore/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$path/acBackup/"$md5all"/ "$path"/acRestore/"$pattern"/ 2>>$logfile
     fi
 ;;
 
@@ -507,7 +507,7 @@ case "$1" in
     printconfig
     echo "ID: $md5all"
     pattern="$2"
-    echo "RESTORE to $path/acb_tmp:"
+    echo "RESTORE to $path/acRestore:"
     #duplicity_status
     # set vars
     connectString="file:///"
@@ -532,13 +532,13 @@ case "$1" in
           exit 0
     fi
 
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
     if [ "$pattern" = "" ]
     then
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acRestore/ 2>>$logfile
     else
-      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$path/acBackup/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile
+      mkdir -p "$path"/acRestore/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/$path/acBackup/"$md5all"/ "$path"/acRestore/"$pattern"/ 2>>$logfile
     fi
 ;;
 
@@ -548,7 +548,7 @@ case "$1" in
     backupTime="$2"
     backupTime=$(date +%s -d "$backupTime")
     pattern="$3"
-    echo "RESTORE to $path/acb_tmp at $backupTime:"
+    echo "RESTORE to $path/acRestore at $backupTime:"
      echo "----------------------------------"
     if [ "$backupTime" != "0" ]
     then
@@ -556,15 +556,15 @@ case "$1" in
     else
       timeString=""
     fi
-    rm -rf "$path"/acb_tmp 2>>$logfile
-    mkdir "$path"/acb_tmp 2>>$logfile
+    rm -rf "$path"/acRestore 2>>$logfile
+    mkdir "$path"/acRestore 2>>$logfile
     #duplicity_status
     if [ "$pattern" = "" ]
     then
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $timeString $connectString/$sftpPATH/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile 
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $timeString $connectString/$sftpPATH/"$md5all"/ "$path"/acRestore/ 2>>$logfile 
     else
-      mkdir -p "$path"/acb_tmp/"$pattern"/ 2>>$logfile
-      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $timeString $connectString/$sftpPATH/"$md5all"/ "$path"/acb_tmp/"$pattern"/ 2>>$logfile 
+      mkdir -p "$path"/acRestore/"$pattern"/ 2>>$logfile
+      $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $timeString $connectString/$sftpPATH/"$md5all"/ "$path"/acRestore/"$pattern"/ 2>>$logfile 
     fi
      echo "----------------------------------"
 ;;
@@ -597,11 +597,11 @@ case "$1" in
 -i)
     md5all=$2
     printconfig
-    echo "RESTORE to $path/acb_tmp:"
+    echo "RESTORE to $path/acRestore:"
     #duplicity_status
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
      echo "----------------------------------"
-    $(echo $torsocks) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/"$md5all"/ "$path"/acb_tmp/ 2>>$logfile 
+    $(echo $torsocks) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/"$md5all"/ "$path"/acRestore/ 2>>$logfile 
      echo "----------------------------------"
 ;;
 
@@ -712,7 +712,7 @@ case "$1" in
     stealthMode=1
     printconfig
     echo "encryted temp backup"
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
      echo "----------------------------------"
     $(echo $torsocks) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/.cache/**" -v4 "$path" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile 
      echo "----------------------------------"
@@ -732,7 +732,7 @@ case "$1" in
     stealthMode=1
     printconfig
     echo "unencryted temp backup"
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
      echo "----------------------------------"
     $(echo $torsocks) $duplicity $strictHostkeyChecking --exclude-other-filesystems --exclude "**/.cache/**" --no-encryption -v4 "$path" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile 
      echo "----------------------------------"
@@ -752,7 +752,7 @@ case "$1" in
     stealthMode=1
     printconfig
     echo "encryted temp backup"
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
      echo "----------------------------------"
     $(echo $torsocks) $duplicity $strictHostkeyChecking --exclude "**/.cache/**" -v4 "$path" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile
      echo "----------------------------------"
@@ -772,7 +772,7 @@ case "$1" in
     stealthMode=1
     printconfig
     echo "unencryted temp backup"
-    rm -rf "$path"/acb_tmp/ 2>>$logfile
+    rm -rf "$path"/acRestore/ 2>>$logfile
      echo "----------------------------------"
     $(echo $torsocks) $duplicity $strictHostkeyChecking --exclude "**/.cache/**" --no-encryption -v4 "$path" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile
      echo "----------------------------------"
