@@ -319,7 +319,7 @@ case "$1" in
   sftpPATH="acBackup"
   
   FREE=$(df . | tail -1 | awk '{print $4}')
-  NEEDED=$(du . | tail -1 | awk '{print $1}')
+  NEEDED=$(du -x . | tail -1 | awk '{print $1}')
   if [ "$FREE" -lt "$NEEDED" ];
   then
 	echo "not enough space on disk!"
@@ -371,7 +371,7 @@ case "$1" in
   sftpPATH="acBackup"
 
   FREE=$(df . | tail -1 | awk '{print $4}')
-  NEEDED=$(du . | tail -1 | awk '{print $1}')
+  NEEDED=$(du -x . | tail -1 | awk '{print $1}')
   if [ "$FREE" -lt "$NEEDED" ];
   then
         echo "not enough space on disk!"
@@ -486,7 +486,7 @@ case "$1" in
     backup2ipfs rebuild
 
     FREE=$(df . | tail -1 | awk '{print $4}')
-    NEEDED=$(du . | tail -1 | awk '{print $1}')
+    NEEDED=$(du -x . | tail -1 | awk '{print $1}')
     if [ "$FREE" -lt "$NEEDED" ];
     then
           echo "not enough space on disk!"
@@ -525,7 +525,7 @@ case "$1" in
     fi
 
     FREE=$(df . | tail -1 | awk '{print $4}')
-    NEEDED=$(du . | tail -1 | awk '{print $1}')
+    NEEDED=$(du -x . | tail -1 | awk '{print $1}')
     if [ "$FREE" -lt "$NEEDED" ];
     then
           echo "not enough space on disk!"
