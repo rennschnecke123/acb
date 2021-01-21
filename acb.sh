@@ -273,7 +273,7 @@ fi
 path=`pwd`;
 md5path=`echo "$path" | md5sum | sed 's/\s*\-//g'`;
 md5mac=$uniqueID
-if [ "$stealthMode" == "1" ] || [ "$1" == "-x" ] || [ "$1" == "-y" ]
+if [ "$stealthMode" == "1" ] || [ "$1" == "-x" ] || [ "$1" == "-y" ] || [ "$1" == "-rLocal" ] || [ "$1" == "-bLocal" ] || [ "$1" == "-fromIPFS" ] || [ "$1" == "-toIPFS" ]
 then
   if [ "$1" == "-x" ] || [ "$1" == "-y" ]
   then
@@ -317,6 +317,7 @@ case "$1" in
   enrypt=''
   usePASSPHRASE="$env PASSPHRASE=$passphrase"
   sftpPATH="acBackup"
+  stealthMode=1
   
   FREE=$(df . | tail -1 | awk '{print $4}')
   NEEDED=$(du -x . | tail -1 | awk '{print $1}')
@@ -369,6 +370,7 @@ case "$1" in
   enrypt=''
   usePASSPHRASE="$env PASSPHRASE=$passphrase"
   sftpPATH="acBackup"
+  stealthMode=1
 
   FREE=$(df . | tail -1 | awk '{print $4}')
   NEEDED=$(du -x . | tail -1 | awk '{print $1}')
@@ -476,6 +478,7 @@ case "$1" in
     enrypt=''
     usePASSPHRASE="$env PASSPHRASE=$passphrase"
     sftpPATH="acBackup"
+    stealthMode=1
 
     which=$(which backup2ipfs)
     if [ "$which" == "" ];
@@ -516,6 +519,7 @@ case "$1" in
     enrypt=''
     usePASSPHRASE="$env PASSPHRASE=$passphrase"
     sftpPATH="acBackup"
+    stealthMode=1
 
     which=$(which backup2ipfs)
     if [ "$which" == "" ];
