@@ -34,7 +34,7 @@
 
     For quick start:
         acb -b -> makes backup of current folder with all subfolders in same partition
-        acb -r -> restores backup to a new subfolder named "acb_tmp" of current folder and restores data to it 
+        acb -r -> restores backup to a new subfolder named "acRestore" of current folder and restores data to it 
                   So this will _not_ overwrite current data!
 
 
