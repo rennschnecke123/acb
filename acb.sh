@@ -273,7 +273,7 @@ fi
 path=`pwd`;
 md5path=`echo "$path" | md5sum | sed 's/\s*\-//g'`;
 md5mac=$uniqueID
-if [ "$stealthMode" == "1" ] || [ "$1" == "-x" ] || [ "$1" == "-y" ] || [ "$1" == "-rLocal" ] || [ "$1" == "-bLocal" ] || [ "$1" == "-fromIPFS" ] || [ "$1" == "-toIPFS" ]
+if [ "$stealthMode" == "1" ] || [ "$1" == "-x" ] || [ "$1" == "-y" ] || [ "$1" == "-rLocal" ] || [ "$1" == "-bLocal" ] || [ "$1" == "-fromIPFS" ] || [ "$1" == "-toIPFS" ] || [ "$1" == "-lbLocal" ] || [ "$1" == "-sLocal" ] 
 then
   if [ "$1" == "-x" ] || [ "$1" == "-y" ]
   then
@@ -438,7 +438,7 @@ case "$1" in
     echo "RESTORE from $ipfsurl to $path/acRestore:"
     #duplicity_status
     rm -rf "$path"/acRestore/ 2>>$logfile
-    if [ "$pattern" = "" ]
+    if [ "$pattern" == "" ]
     then
       $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) "$ipfsurl" "$path"/acRestore/ 2>>$logfile
     else
@@ -456,7 +456,7 @@ case "$1" in
     echo "RESTORE to $path/acRestore:"
     #duplicity_status
     rm -rf "$path"/acRestore/ 2>>$logfile
-    if [ "$pattern" = "" ]
+    if [ "$pattern" == "" ]
     then
       $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$sftpPATH/"$md5all"/ "$path"/acRestore/ 2>>$logfile 
     else
@@ -497,7 +497,7 @@ case "$1" in
     fi
 
     rm -rf "$path"/acRestore/ 2>>$logfile
-    if [ "$pattern" = "" ]
+    if [ "$pattern" == "" ]
     then
       $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/$path/acBackup/"$md5all"/ "$path"/acRestore/ 2>>$logfile
     else
@@ -563,7 +563,7 @@ case "$1" in
     rm -rf "$path"/acRestore 2>>$logfile
     mkdir "$path"/acRestore 2>>$logfile
     #duplicity_status
-    if [ "$pattern" = "" ]
+    if [ "$pattern" == "" ]
     then
       $(echo $torsocks) $(echo $usePASSPHRASE) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $timeString $connectString/$sftpPATH/"$md5all"/ "$path"/acRestore/ 2>>$logfile 
     else
@@ -591,6 +591,15 @@ case "$1" in
      echo "----------------------------------"
 ;;
 
+-lbLocal)
+    printconfig
+    connectString="file:///"
+    sftpPATH="acBackup"
+    echo "LIST backups from $path/:"
+     echo "----------------------------------"
+    duplicity_status
+     echo "----------------------------------"
+;;
 
 -u)
     printconfig
@@ -598,24 +607,32 @@ case "$1" in
     find $HOME/.cache/duplicity/ -type f -delete 2>>$logfile
 ;;
 
+
 -i)
     md5all=$2
+    pattern="$3"
     printconfig
     echo "RESTORE to $path/acRestore:"
     #duplicity_status
     rm -rf "$path"/acRestore/ 2>>$logfile
      echo "----------------------------------"
-    $(echo $torsocks) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/"$md5all"/ "$path"/acRestore/ 2>>$logfile 
+    if [ "$pattern" == "" ];
+    then
+            $(echo $torsocks) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) $connectString/"$md5all"/ "$path"/acRestore/ 2>>$logfile
+    else
+            $(echo $torsocks) $duplicity restore $strictHostkeyChecking -v4 $(echo $encrypt) --file-to-restore "$pattern" $connectString/"$md5all"/ "$path"/acRestore/"$pattern" 2>>$logfile
+    fi
      echo "----------------------------------"
 ;;
 
+
 -s)
     pattern=$2
-    printconfig
+    usePASSPHRASE="$env PASSPHRASE=$passphrase"
     echo "SEARCH for $pattern in $path/:"
     #duplicity_status
      echo "----------------------------------"
-    collectionstatus=$($(echo $torsocks) $(echo $usePASSPHRASE) $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
+    collectionstatus=$($(echo $torsocks) $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
     IFS=$'\n'
     statusAll=''
     find $acbDIR/.cache/ -type f -mtime +14 -delete >/dev/null 2>&1
@@ -659,6 +676,65 @@ case "$1" in
     fi
      echo "----------------------------------"
 ;;
+
+-sLocal)
+    pattern=$2
+    connectString="file:///"
+    sftpPATH="acBackup"
+    torsocks=""
+    useTOR=0
+    usePASSPHRASE="$env PASSPHRASE=$passphrase"
+    connectString="file:///"
+    stealthMode=1
+    printconfig
+    echo "SEARCH for $pattern in $path/:"
+    #duplicity_status
+     echo "----------------------------------"
+    collectionstatus=$($(echo $torsocks) $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
+    IFS=$'\n'
+    statusAll=''
+    find $acbDIR/.cache/ -type f -mtime +14 -delete >/dev/null 2>&1
+    for backupTime in $collectionstatus
+    do
+      backupTime=$(date +%s -d "$backupTime")
+      if [ -e $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz ]
+      then
+        status=$(zcat $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz)
+        #touch $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz >/dev/null 2>&1
+      else
+        status=$($(echo $torsocks) $duplicity list-current-files $strictHostkeyChecking -v4 $(echo $encrypt) --time "$backupTime" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile)
+        if [ ! -e $acbDIR/.cache/ ]
+        then
+          mkdir -p $acbDIR/.cache/
+        fi
+        if [ "$status" != "" ] && [ ! -e $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz ]
+        then
+          echo -e "$status" | gzip -c > $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz &
+        fi
+      fi
+      echo -n "."
+      status=$(echo -e "$status" | sed "s/^/$backupTime\t/g")
+      if [ "$pattern" = "" ]
+      then
+        statusAll=$(echo -e "$statusAll\n$status")
+      else
+        statusAll=$(echo -e "$statusAll\n$status" | grep -i "$pattern")
+      fi
+    done
+    if [ "$statusAll" != "" ]
+    then
+            statusAll=$(echo -e "$statusAll\n$status" | sort -k 2 | uniq -f 1 | sort)
+      echo
+      if [ "$pattern" = "" ]
+      then
+        echo -e "$statusAll"
+      else
+        echo -e "$statusAll" | grep -i "$pattern"
+      fi
+    fi
+     echo "----------------------------------"
+;;
+
 
 -lf)
     pattern=$2
