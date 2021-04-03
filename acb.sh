@@ -628,11 +628,11 @@ case "$1" in
 
 -s)
     pattern=$2
-    usePASSPHRASE="$env PASSPHRASE=$passphrase"
+    #usePASSPHRASE="$env PASSPHRASE=$passphrase"
     echo "SEARCH for $pattern in $path/:"
     #duplicity_status
      echo "----------------------------------"
-    collectionstatus=$($(echo $torsocks) $usePASSPHRASE $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
+    collectionstatus=$($(echo $torsocks) $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
     IFS=$'\n'
     statusAll=''
     find $acbDIR/.cache/ -type f -mtime +14 -delete >/dev/null 2>&1
@@ -644,7 +644,7 @@ case "$1" in
 	status=$(zcat $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz)
 	#touch $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz >/dev/null 2>&1
       else
-        status=$($(echo $torsocks) $usePASSPHRASE $duplicity list-current-files $strictHostkeyChecking -v4 $(echo $encrypt) --time "$backupTime" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile) 
+        status=$($(echo $torsocks) $duplicity list-current-files $strictHostkeyChecking -v4 $(echo $encrypt) --time "$backupTime" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile) 
         if [ ! -e $acbDIR/.cache/ ]
         then
 	  mkdir -p $acbDIR/.cache/
@@ -683,33 +683,33 @@ case "$1" in
     sftpPATH="acBackup"
     torsocks=""
     useTOR=0
-    usePASSPHRASE="$env PASSPHRASE=$passphrase"
+    #usePASSPHRASE="$env PASSPHRASE=$passphrase"
     connectString="file:///"
     stealthMode=1
     printconfig
     echo "SEARCH for $pattern in $path/:"
     #duplicity_status
      echo "----------------------------------"
-    collectionstatus=$($(echo $torsocks) $usePASSPHRASE $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
+    collectionstatus=$($(echo $torsocks) $duplicity collection-status $strictHostkeyChecking $connectString/$sftpPATH/"$md5all"/ 2>>$logfile | grep -e Full -e Incremental -e Vollständig -e Schrittweise | sed "s/^\s*\w*//g" | sed "s/\w*\s*$//g" | sed "s/^\s*//g" | sed "s/\s*$//g")
     IFS=$'\n'
     statusAll=''
     find $acbDIR/.cache/ -type f -mtime +14 -delete >/dev/null 2>&1
     for backupTime in $collectionstatus
     do
       backupTime=$(date +%s -d "$backupTime")
-      if [ -e $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz ]
+      if [ -e $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime-local.log.gz ]
       then
-        status=$(zcat $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz)
-        #touch $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz >/dev/null 2>&1
+        status=$(zcat $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime-local.log.gz)
+        #touch $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime-local.log.gz >/dev/null 2>&1
       else
-        status=$($(echo $torsocks) $usePASSPHRASE $duplicity list-current-files $strictHostkeyChecking -v4 $(echo $encrypt) --time "$backupTime" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile)
+        status=$($(echo $torsocks) $duplicity list-current-files $strictHostkeyChecking -v4 $(echo $encrypt) --time "$backupTime" $connectString/$sftpPATH/"$md5all"/ 2>>$logfile)
         if [ ! -e $acbDIR/.cache/ ]
         then
           mkdir -p $acbDIR/.cache/
         fi
-        if [ "$status" != "" ] && [ ! -e $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz ]
+        if [ "$status" != "" ] && [ ! -e $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime-local.log.gz ]
         then
-          echo -e "$status" | gzip -c > $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime.log.gz &
+          echo -e "$status" | gzip -c > $acbDIR/.cache/$sftpHOST-$md5allCache-$backupTime-local.log.gz &
         fi
       fi
       echo -n "."
@@ -905,4 +905,3 @@ otherEOF
     exit
 ;;
 esac
-
